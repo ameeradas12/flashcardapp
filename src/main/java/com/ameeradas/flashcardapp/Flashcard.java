@@ -4,6 +4,9 @@ public class Flashcard {
     private String question;
     private String answer;
 
+    public Flashcard() {
+    }
+
     public Flashcard(String q, String a){
         question = q;
         answer = a;

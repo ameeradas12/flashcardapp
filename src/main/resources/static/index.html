@@ -30,19 +30,40 @@
 </head>
 <body>
 
-    <h1>Flashcard App</h1>
+    <div id="loginSection">
+        <h2>Enter Your Name</h2>
+        <input type="text" id="usernameInput" placeholder="Your name">
+        <button onclick="startSession()">Start</button>
+    </div>
 
-    <h2>Add a Card</h2>
-    <input type="text" id="questionInput" placeholder="Enter question">
-    <input type="text" id="answerInput" placeholder="Enter answer">
-    <button onclick="addCard()">Add Card</button>
+    <div id="appSection" style="display:none;">
+        <h1>Flashcard App</h1>
 
-    <h2>Your Cards</h2>
-    <div id="cardList"></div>
+        <h2>Add a Card</h2>
+        <input type="text" id="questionInput" placeholder="Enter question">
+        <input type="text" id="answerInput" placeholder="Enter answer">
+        <button onclick="addCard()">Add Card</button>
+
+        <h2>Your Cards</h2>
+        <div id="cardList"></div>
+    </div>
 
     <script>
+        let username = '';
+
+        function startSession() {
+            username = document.getElementById('usernameInput').value.trim();
+            if (username === '') {
+                alert('Please enter a name');
+                return;
+            }
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('appSection').style.display = 'block';
+            loadCards();
+        }
+
         function loadCards() {
-            fetch('/cards')
+            fetch('/cards?user=' + encodeURIComponent(username))
                 .then(response => response.json())
                 .then(cards => {
                     const cardList = document.getElementById('cardList');
@@ -60,19 +81,16 @@
             const question = document.getElementById('questionInput').value;
             const answer = document.getElementById('answerInput').value;
 
-            fetch('/cards?question=' + encodeURIComponent(question) + '&answer=' + encodeURIComponent(answer), {
+            fetch('/cards?user=' + encodeURIComponent(username) + '&question=' + encodeURIComponent(question) + '&answer=' + encodeURIComponent(answer), {
                 method: 'POST'
             })
                 .then(response => response.text())
                 .then(message => {
-                    console.log(message);
                     document.getElementById('questionInput').value = '';
                     document.getElementById('answerInput').value = '';
                     loadCards();
                 });
         }
-
-        loadCards();
     </script>
 
 </body>
