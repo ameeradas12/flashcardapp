@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flashcard App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        input {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Flashcard App</h1>
+
+    <h2>Add a Card</h2>
+    <input type="text" id="questionInput" placeholder="Enter question">
+    <input type="text" id="answerInput" placeholder="Enter answer">
+    <button onclick="addCard()">Add Card</button>
+
+    <h2>Your Cards</h2>
+    <div id="cardList"></div>
+
+    <script>
+        function loadCards() {
+            fetch('/cards')
+                .then(response => response.json())
+                .then(cards => {
+                    const cardList = document.getElementById('cardList');
+                    cardList.innerHTML = '';
+                    cards.forEach(card => {
+                        const div = document.createElement('div');
+                        div.className = 'card';
+                        div.innerHTML = '<strong>Q: ' + card.question + '</strong><br>A: ' + card.answer;
+                        cardList.appendChild(div);
+                    });
+                });
+        }
+
+        function addCard() {
+            const question = document.getElementById('questionInput').value;
+            const answer = document.getElementById('answerInput').value;
+
+            fetch('/cards?question=' + encodeURIComponent(question) + '&answer=' + encodeURIComponent(answer), {
+                method: 'POST'
+            })
+                .then(response => response.text())
+                .then(message => {
+                    console.log(message);
+                    document.getElementById('questionInput').value = '';
+                    document.getElementById('answerInput').value = '';
+                    loadCards();
+                });
+        }
+
+        loadCards();
+    </script>
+
+</body>
+</html>
